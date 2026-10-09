@@ -16,7 +16,7 @@ from ais.pipeline import run_demo
 from ais.store import Store
 
 app = FastAPI(title="Agent Immune System")
-INDEX = (pathlib.Path(__file__).parent / "static" / "index.html").read_text()
+INDEX = (pathlib.Path(__file__).parent / "static" / "index.html").read_text(encoding="utf-8")
 
 
 @app.get("/", response_class=HTMLResponse)
