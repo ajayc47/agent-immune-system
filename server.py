@@ -8,15 +8,21 @@ GET /api/stats   -> corpus size + rolling detection summary (with query latency)
 POST /api/run    -> run the full detect->replay->vaccinate->reverify pipeline
 """
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 import pathlib
 
 from ais.detect import summary
 from ais.pipeline import run_demo
 from ais.store import Store
 
+STATIC = pathlib.Path(__file__).parent / "static"
 app = FastAPI(title="Agent Immune System")
-INDEX = (pathlib.Path(__file__).parent / "static" / "index.html").read_text(encoding="utf-8")
+INDEX = (STATIC / "index.html").read_text(encoding="utf-8")
+
+
+@app.get("/static/securedai-logo.png")
+def logo():
+    return FileResponse(STATIC / "securedai-logo.png", media_type="image/png")
 
 
 @app.get("/", response_class=HTMLResponse)
