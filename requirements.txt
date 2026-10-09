@@ -1,5 +1,7 @@
-chdb>=4.0
 clickhouse-connect>=0.7
 openai>=1.40
 fastapi>=0.110
 uvicorn>=0.27
+# chdb is the offline embedded engine (macOS/Linux only; not available on Windows).
+# On Windows, run against ClickHouse Cloud instead (set CLICKHOUSE_HOST in .env).
+chdb>=4.0; platform_system != "Windows"

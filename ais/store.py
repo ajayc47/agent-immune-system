@@ -58,7 +58,14 @@ class Store:
                 database=os.getenv("CLICKHOUSE_DATABASE", "default"),
             )
         else:
-            from chdb import session
+            try:
+                from chdb import session
+            except ImportError as e:
+                raise RuntimeError(
+                    "No CLICKHOUSE_HOST set and the offline engine (chdb) is unavailable "
+                    "(chdb does not support Windows). Set CLICKHOUSE_HOST in your .env to "
+                    "run against ClickHouse Cloud, or use macOS/Linux/WSL for the offline engine."
+                ) from e
             path = os.getenv("AIS_DATA_DIR", os.path.join(os.path.dirname(__file__), "..", "data"))
             os.makedirs(path, exist_ok=True)
             self.sess = session.Session(path)
