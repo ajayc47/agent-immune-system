@@ -3,125 +3,156 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Agent Immune System</title>
+<title>Agent Immune System - SecuredAI.org</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0b0f17; --panel:#121826; --panel2:#0e1420; --line:#1f2a3c;
-    --ink:#e6edf7; --muted:#8aa0bd; --accent:#4cc2ff; --good:#3fd07f;
-    --bad:#ff6b6b; --warn:#ffcf5c; --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+    --ink:#090E17; --ink-2:#0C1220; --panel:#111A2B; --panel-2:#16223A;
+    --line:#223047; --line-soft:#1A2536; --paper:#E9EEF6; --paper-dim:#C7D0E0;
+    --fog:#8A96AC; --fog-dim:#5E6B82;
+    --beacon:#F6941E; --beacon-dim:#B8630F; --safe:#34D399; --alert:#E8C13A; --danger:#FF5D5D;
+    --display:'Space Grotesk',sans-serif; --body:'Inter',sans-serif; --mono:'IBM Plex Mono',monospace;
+    --radius:3px;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-  header{padding:22px 28px;border-bottom:1px solid var(--line);
-    display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-  h1{font-size:19px;margin:0;letter-spacing:.2px}
-  .tag{color:var(--muted);font-size:13px}
-  .wrap{max-width:1040px;margin:0 auto;padding:24px 28px 72px}
+  body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--body);
+    background-image:radial-gradient(900px 500px at 80% -10%, rgba(246,148,30,.07), transparent 60%)}
+  header{padding:22px 28px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:20px;flex-wrap:wrap;background:var(--ink-2)}
+  header img{height:38px;width:auto;display:block}
+  .brandfallback{font-family:var(--display);font-weight:700;font-size:22px;color:var(--paper);letter-spacing:.3px}
+  .brandfallback b{color:var(--beacon)}
+  .tag{color:var(--fog);font-size:13px;font-family:var(--mono);letter-spacing:.3px}
+  .wrap{max-width:1080px;margin:0 auto;padding:26px 28px 90px}
+  .lead{font-family:var(--display);font-size:27px;font-weight:600;line-height:1.25;margin:4px 0 22px;max-width:880px}
+  .lead span{color:var(--beacon)}
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
-  .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-  .stat .n{font-size:24px;font-weight:650;font-variant-numeric:tabular-nums}
-  .stat .l{color:var(--muted);font-size:12px;margin-top:2px}
-  button{background:var(--accent);color:#04121c;border:0;border-radius:10px;
-    padding:11px 18px;font-weight:650;font-size:15px;cursor:pointer}
-  button:disabled{opacity:.5;cursor:default}
-  .stage{background:var(--panel);border:1px solid var(--line);border-radius:12px;
-    padding:0;margin:14px 0;overflow:hidden;opacity:.4;transition:opacity .3s}
-  .stage.on{opacity:1}
-  .stage h2{font-size:14px;margin:0;padding:12px 16px;border-bottom:1px solid var(--line);
-    display:flex;gap:10px;align-items:center}
-  .stage .body{padding:14px 16px}
-  .num{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--panel2);
-    border:1px solid var(--line);align-items:center;justify-content:center;font-size:12px;color:var(--muted)}
-  .pill{font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
-  .pill.good{color:var(--good);border-color:#1c4a33}
-  .pill.bad{color:var(--bad);border-color:#4a1f1f}
-  pre{font-family:var(--mono);font-size:12.5px;background:var(--panel2);border:1px solid var(--line);
-    border-radius:8px;padding:12px;overflow:auto;margin:8px 0 0;white-space:pre}
-  .kv{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-  .kv span{font-family:var(--mono);font-size:12px;background:var(--panel2);
-    border:1px solid var(--line);padding:3px 8px;border-radius:7px}
-  .muted{color:var(--muted)}
-  .big{font-size:18px;font-weight:650;font-variant-numeric:tabular-nums}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:15px 17px}
+  .stat .n{font-family:var(--mono);font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--paper)}
+  .stat .l{color:var(--fog);font-size:12px;margin-top:3px;text-transform:uppercase;letter-spacing:.6px}
+  .controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+  button{font-family:var(--display);background:var(--beacon);color:#1a0f02;border:0;border-radius:var(--radius);
+    padding:12px 20px;font-weight:600;font-size:15px;cursor:pointer;letter-spacing:.2px}
+  button.ghost{background:transparent;color:var(--paper);border:1px solid var(--line)}
+  button:disabled{opacity:.45;cursor:default}
+  .stage{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    margin:14px 0;overflow:hidden;opacity:.32;transform:translateY(6px);transition:opacity .4s,transform .4s,border-color .4s}
+  .stage.on{opacity:1;transform:none}
+  .stage.active{border-color:var(--beacon);box-shadow:0 0 0 1px rgba(246,148,30,.35)}
+  .stage h2{font-family:var(--display);font-size:15px;font-weight:600;margin:0;padding:13px 16px;
+    border-bottom:1px solid var(--line);display:flex;gap:11px;align-items:center;letter-spacing:.3px}
+  .stage .body{padding:15px 16px}
+  .num{display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--ink);
+    border:1px solid var(--line);align-items:center;justify-content:center;font-size:12px;color:var(--beacon);font-family:var(--mono);font-weight:600}
+  .pill{font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--fog);font-family:var(--mono);margin-left:auto}
+  .pill.good{color:var(--safe);border-color:#1c4a37}
+  .pill.bad{color:var(--danger);border-color:#4a2222}
+  .pill.warn{color:var(--alert);border-color:#4a4420}
+  pre{font-family:var(--mono);font-size:12.5px;background:var(--ink-2);border:1px solid var(--line-soft);
+    border-radius:var(--radius);padding:12px;overflow:auto;margin:8px 0 0;white-space:pre;color:var(--paper-dim)}
+  .kv{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .kv span{font-family:var(--mono);font-size:12px;background:var(--ink-2);
+    border:1px solid var(--line-soft);padding:4px 9px;border-radius:var(--radius);color:var(--paper-dim)}
+  .muted{color:var(--fog);font-size:14px}
+  .diffwrap{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  footer{color:var(--fog-dim);font-family:var(--mono);font-size:12px;margin-top:26px;text-align:center;letter-spacing:.3px}
 </style>
 </head>
 <body>
 <header>
-  <h1>🛡️ Agent Immune System</h1>
-  <span class="tag">runtime defense for injection-susceptible AI agents · detect → explain → vaccinate</span>
+  <img src="https://securedai.org/assets/logo-full.png" alt="SecuredAI.org" onerror="this.style.display='none';document.getElementById('bf').style.display='block'">
+  <span id="bf" class="brandfallback" style="display:none">Secured<b>AI</b>.org</span>
+  <span class="tag">AGENT IMMUNE SYSTEM &nbsp;/&nbsp; detect &#183; explain &#183; vaccinate &#183; verify</span>
 </header>
 <div class="wrap">
+  <p class="lead">When an AI agent is hijacked by a poisoned input, this proves <span>which input caused it</span> and ships a guardrail <span>verified against all of production</span> before it deploys.</p>
   <div class="stats" id="stats"></div>
-  <button id="run" onclick="runDemo()">Run live attack → defense</button>
+  <div class="controls">
+    <button id="run" onclick="runDemo(false)">Run live attack &#8594; defense</button>
+    <button id="auto" class="ghost" onclick="runDemo(true)">Auto-play (for recording)</button>
+  </div>
 
   <div class="stage" id="s1"><h2><span class="num">1</span> Attack recorded <span id="p1" class="pill"></span></h2>
     <div class="body"><span class="muted">A poisoned support ticket enters the agent's context. The agent obeys it.</span><pre id="b1"></pre></div></div>
 
   <div class="stage" id="s2"><h2><span class="num">2</span> Detected in real time <span id="p2" class="pill"></span></h2>
-    <div class="body"><span class="muted">Provenance-flow query over ClickHouse: external send of sensitive data + untrusted input present.</span><pre id="b2"></pre></div></div>
+    <div class="body"><span class="muted">Provenance-flow query over ClickHouse: external send of sensitive data, with untrusted input present.</span><pre id="b2"></pre></div></div>
 
   <div class="stage" id="s3"><h2><span class="num">3</span> Causal replay: what caused it <span id="p3" class="pill"></span></h2>
     <div class="body"><span class="muted">Re-run with each untrusted input removed. The item whose removal stops the leak is the cause.</span><pre id="b3"></pre></div></div>
 
   <div class="stage" id="s4"><h2><span class="num">4</span> Vaccine: synthesize + verify against history <span id="p4" class="pill"></span></h2>
-    <div class="body"><span class="muted">Mutate the attack, synthesize a guardrail, replay it against the whole recorded corpus. Deploy only if it blocks every variant with zero false positives.</span>
+    <div class="body"><span class="muted">An open model on Akash mutates the attack. A guardrail is synthesized, then replayed against the whole corpus. Deploy only on zero false positives.</span>
       <div class="kv" id="k4"></div><pre id="b4"></pre></div></div>
 
   <div class="stage" id="s5"><h2><span class="num">5</span> Re-run attack: immune <span id="p5" class="pill"></span></h2>
     <div class="body"><pre id="b5"></pre></div></div>
+
+  <footer>SecuredAI.org &#183; Agent Immune System &#183; live on ClickHouse Cloud + AkashML</footer>
 </div>
 <script>
 const $=s=>document.querySelector(s);
-function fmt(n){return (n??0).toLocaleString()}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function fmt(n){return (n==null?0:n).toLocaleString()}
 async function loadStats(){
-  const r=await fetch('/api/stats').then(r=>r.json());
-  const s=r.summary||{};
-  $('#stats').innerHTML=`
-    <div class="stat"><div class="n">${fmt(s.sessions)}</div><div class="l">recorded sessions (${r.backend})</div></div>
-    <div class="stat"><div class="n">${fmt(s.flagged)}</div><div class="l">flagged for data egress</div></div>
-    <div class="stat"><div class="n">${fmt(s.true_attacks)}</div><div class="l">labeled attacks</div></div>
-    <div class="stat"><div class="n">${r.latency_ms} ms</div><div class="l">summary query latency</div></div>`;
+  try{
+    const r=await fetch('/api/stats').then(r=>r.json());
+    const s=r.summary||{};
+    $('#stats').innerHTML=`
+      <div class="stat"><div class="n">${fmt(s.sessions)}</div><div class="l">recorded sessions (${r.backend})</div></div>
+      <div class="stat"><div class="n">${fmt(s.flagged)}</div><div class="l">flagged for data egress</div></div>
+      <div class="stat"><div class="n">${fmt(s.true_attacks)}</div><div class="l">labeled attacks</div></div>
+      <div class="stat"><div class="n">${r.latency_ms} ms</div><div class="l">summary query latency</div></div>`;
+  }catch(e){}
 }
-function show(id){$(id).classList.add('on')}
-function pill(id,ok,txt){const e=$(id);e.textContent=txt;e.className='pill '+(ok?'good':'bad')}
-async function runDemo(){
-  $('#run').disabled=true;
-  for(const i of [1,2,3,4,5]){$('#s'+i).classList.remove('on');$('#b'+i).textContent=''}
+function pill(id,cls,txt){const e=$(id);e.textContent=txt;e.className='pill '+cls}
+function activate(i){for(const n of [1,2,3,4,5])$('#s'+n).classList.toggle('active',n===i)}
+function reveal(i,auto){const el=$('#s'+i);el.classList.add('on');activate(i);
+  if(auto)el.scrollIntoView({behavior:'smooth',block:'center'})}
+
+async function runDemo(auto){
+  $('#run').disabled=true;$('#auto').disabled=true;
+  for(const i of [1,2,3,4,5]){const s=$('#s'+i);s.classList.remove('on','active');$('#b'+i).textContent=''}
+  $('#k4').innerHTML='';
+  const gap=auto?1600:450;
   const d=await fetch('/api/run',{method:'POST'}).then(r=>r.json());
 
-  show('#s1'); pill('#p1', !d.leaked, d.leaked?'DATA LEAKED':'clean');
+  reveal(1,auto); pill('#p1', d.leaked?'bad':'good', d.leaked?'DATA LEAKED':'clean');
   $('#b1').textContent=d.recorded_actions.map(a=>a[0]+'  →  '+a[1]).join('\n');
+  await sleep(gap);
 
-  setTimeout(()=>{show('#s2');
-    const f=d.detection.flagged[0]||{};
-    pill('#p2', true, d.detection.latency_ms+' ms');
-    $('#b2').textContent='flagged session: '+(f.session_id||'-')+'\nsink: '+(f.sink||'-')+'\nquery latency: '+d.detection.latency_ms+' ms';
-  },500);
+  reveal(2,auto);
+  const f=d.detection.flagged[0]||{};
+  pill('#p2','warn',d.detection.latency_ms+' ms');
+  $('#b2').textContent='flagged session: '+(f.session_id||'-')+'\nsink: '+(f.sink||'-')+'\nquery latency: '+d.detection.latency_ms+' ms';
+  await sleep(gap);
 
-  setTimeout(()=>{show('#s3');
-    pill('#p3', true, 'cause: '+(d.replay.culprits.join(', ')||'-'));
-    $('#b3').textContent=d.replay.diff||'(no causal item found)';
-  },1000);
+  reveal(3,auto);
+  pill('#p3','warn','cause: '+(d.replay.culprits.join(', ')||'-'));
+  $('#b3').textContent=d.replay.diff||'(no causal item found)';
+  await sleep(gap);
 
-  setTimeout(()=>{show('#s4');
-    const v=d.vaccine;
-    pill('#p4', v.deployed, v.deployed?'DEPLOYED':'rejected');
-    $('#k4').innerHTML=[
-      'variants blocked '+v.variants_blocked+'/'+v.variants_total,
-      'false positives '+v.false_positives,
-      'history checked '+fmt(v.history_rows)+' rows',
-      'verify '+v.verify_ms+' ms',
-      'mutator '+v.mutator,
-    ].map(t=>'<span>'+t+'</span>').join('');
-    $('#b4').textContent=v.summary;
-  },1500);
+  reveal(4,auto);
+  const v=d.vaccine;
+  pill('#p4', v.deployed?'good':'bad', v.deployed?'DEPLOYED':'rejected');
+  $('#k4').innerHTML=[
+    'variants blocked '+v.variants_blocked+'/'+v.variants_total,
+    'false positives '+v.false_positives,
+    'history checked '+fmt(v.history_rows)+' rows',
+    'verify '+v.verify_ms+' ms',
+    'mutator '+v.mutator,
+  ].map(t=>'<span>'+t+'</span>').join('');
+  $('#b4').textContent=v.summary;
+  await sleep(gap);
 
-  setTimeout(()=>{show('#s5');
-    const a=d.after||{};
-    pill('#p5', !a.leaked, a.leaked?'still leaking':'blocked, no leak');
-    $('#b5').textContent=(a.actions||[]).map(x=>x[0]+'  →  '+x[1]).join('\n')+(a.blocked?'\n\n[guardrail blocked the poisoned input]':'');
-    $('#run').disabled=false; loadStats();
-  },2000);
+  reveal(5,auto);
+  const a=d.after||{};
+  pill('#p5', a.leaked?'bad':'good', a.leaked?'still leaking':'blocked, no leak');
+  $('#b5').textContent=(a.actions||[]).map(x=>x[0]+'  →  '+x[1]).join('\n')+(a.blocked?'\n\n[guardrail blocked the poisoned input]':'');
+  activate(0);
+  $('#run').disabled=false;$('#auto').disabled=false;
+  loadStats();
 }
 loadStats();
 </script>
