@@ -1,0 +1,5 @@
+chdb>=4.0
+clickhouse-connect>=0.7
+openai>=1.40
+fastapi>=0.110
+uvicorn>=0.27

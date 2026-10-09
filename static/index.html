@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Immune System</title>
+<style>
+  :root{
+    --bg:#0b0f17; --panel:#121826; --panel2:#0e1420; --line:#1f2a3c;
+    --ink:#e6edf7; --muted:#8aa0bd; --accent:#4cc2ff; --good:#3fd07f;
+    --bad:#ff6b6b; --warn:#ffcf5c; --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  header{padding:22px 28px;border-bottom:1px solid var(--line);
+    display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  h1{font-size:19px;margin:0;letter-spacing:.2px}
+  .tag{color:var(--muted);font-size:13px}
+  .wrap{max-width:1040px;margin:0 auto;padding:24px 28px 72px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .stat .n{font-size:24px;font-weight:650;font-variant-numeric:tabular-nums}
+  .stat .l{color:var(--muted);font-size:12px;margin-top:2px}
+  button{background:var(--accent);color:#04121c;border:0;border-radius:10px;
+    padding:11px 18px;font-weight:650;font-size:15px;cursor:pointer}
+  button:disabled{opacity:.5;cursor:default}
+  .stage{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:0;margin:14px 0;overflow:hidden;opacity:.4;transition:opacity .3s}
+  .stage.on{opacity:1}
+  .stage h2{font-size:14px;margin:0;padding:12px 16px;border-bottom:1px solid var(--line);
+    display:flex;gap:10px;align-items:center}
+  .stage .body{padding:14px 16px}
+  .num{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--panel2);
+    border:1px solid var(--line);align-items:center;justify-content:center;font-size:12px;color:var(--muted)}
+  .pill{font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+  .pill.good{color:var(--good);border-color:#1c4a33}
+  .pill.bad{color:var(--bad);border-color:#4a1f1f}
+  pre{font-family:var(--mono);font-size:12.5px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:8px;padding:12px;overflow:auto;margin:8px 0 0;white-space:pre}
+  .kv{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .kv span{font-family:var(--mono);font-size:12px;background:var(--panel2);
+    border:1px solid var(--line);padding:3px 8px;border-radius:7px}
+  .muted{color:var(--muted)}
+  .big{font-size:18px;font-weight:650;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<header>
+  <h1>🛡️ Agent Immune System</h1>
+  <span class="tag">runtime defense for injection-susceptible AI agents · detect → explain → vaccinate</span>
+</header>
+<div class="wrap">
+  <div class="stats" id="stats"></div>
+  <button id="run" onclick="runDemo()">Run live attack → defense</button>
+
+  <div class="stage" id="s1"><h2><span class="num">1</span> Attack recorded <span id="p1" class="pill"></span></h2>
+    <div class="body"><span class="muted">A poisoned support ticket enters the agent's context. The agent obeys it.</span><pre id="b1"></pre></div></div>
+
+  <div class="stage" id="s2"><h2><span class="num">2</span> Detected in real time <span id="p2" class="pill"></span></h2>
+    <div class="body"><span class="muted">Provenance-flow query over ClickHouse: external send of sensitive data + untrusted input present.</span><pre id="b2"></pre></div></div>
+
+  <div class="stage" id="s3"><h2><span class="num">3</span> Causal replay: what caused it <span id="p3" class="pill"></span></h2>
+    <div class="body"><span class="muted">Re-run with each untrusted input removed. The item whose removal stops the leak is the cause.</span><pre id="b3"></pre></div></div>
+
+  <div class="stage" id="s4"><h2><span class="num">4</span> Vaccine: synthesize + verify against history <span id="p4" class="pill"></span></h2>
+    <div class="body"><span class="muted">Mutate the attack, synthesize a guardrail, replay it against the whole recorded corpus. Deploy only if it blocks every variant with zero false positives.</span>
+      <div class="kv" id="k4"></div><pre id="b4"></pre></div></div>
+
+  <div class="stage" id="s5"><h2><span class="num">5</span> Re-run attack: immune <span id="p5" class="pill"></span></h2>
+    <div class="body"><pre id="b5"></pre></div></div>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+function fmt(n){return (n??0).toLocaleString()}
+async function loadStats(){
+  const r=await fetch('/api/stats').then(r=>r.json());
+  const s=r.summary||{};
+  $('#stats').innerHTML=`
+    <div class="stat"><div class="n">${fmt(s.sessions)}</div><div class="l">recorded sessions (${r.backend})</div></div>
+    <div class="stat"><div class="n">${fmt(s.flagged)}</div><div class="l">flagged for data egress</div></div>
+    <div class="stat"><div class="n">${fmt(s.true_attacks)}</div><div class="l">labeled attacks</div></div>
+    <div class="stat"><div class="n">${r.latency_ms} ms</div><div class="l">summary query latency</div></div>`;
+}
+function show(id){$(id).classList.add('on')}
+function pill(id,ok,txt){const e=$(id);e.textContent=txt;e.className='pill '+(ok?'good':'bad')}
+async function runDemo(){
+  $('#run').disabled=true;
+  for(const i of [1,2,3,4,5]){$('#s'+i).classList.remove('on');$('#b'+i).textContent=''}
+  const d=await fetch('/api/run',{method:'POST'}).then(r=>r.json());
+
+  show('#s1'); pill('#p1', !d.leaked, d.leaked?'DATA LEAKED':'clean');
+  $('#b1').textContent=d.recorded_actions.map(a=>a[0]+'  →  '+a[1]).join('\n');
+
+  setTimeout(()=>{show('#s2');
+    const f=d.detection.flagged[0]||{};
+    pill('#p2', true, d.detection.latency_ms+' ms');
+    $('#b2').textContent='flagged session: '+(f.session_id||'-')+'\nsink: '+(f.sink||'-')+'\nquery latency: '+d.detection.latency_ms+' ms';
+  },500);
+
+  setTimeout(()=>{show('#s3');
+    pill('#p3', true, 'cause: '+(d.replay.culprits.join(', ')||'-'));
+    $('#b3').textContent=d.replay.diff||'(no causal item found)';
+  },1000);
+
+  setTimeout(()=>{show('#s4');
+    const v=d.vaccine;
+    pill('#p4', v.deployed, v.deployed?'DEPLOYED':'rejected');
+    $('#k4').innerHTML=[
+      'variants blocked '+v.variants_blocked+'/'+v.variants_total,
+      'false positives '+v.false_positives,
+      'history checked '+fmt(v.history_rows)+' rows',
+      'verify '+v.verify_ms+' ms',
+      'mutator '+v.mutator,
+    ].map(t=>'<span>'+t+'</span>').join('');
+    $('#b4').textContent=v.summary;
+  },1500);
+
+  setTimeout(()=>{show('#s5');
+    const a=d.after||{};
+    pill('#p5', !a.leaked, a.leaked?'still leaking':'blocked, no leak');
+    $('#b5').textContent=(a.actions||[]).map(x=>x[0]+'  →  '+x[1]).join('\n')+(a.blocked?'\n\n[guardrail blocked the poisoned input]':'');
+    $('#run').disabled=false; loadStats();
+  },2000);
+}
+loadStats();
+</script>
+</body>
+</html>
